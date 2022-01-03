@@ -7,7 +7,7 @@ food_consumption<-readRDS("food_consumption.rds")
 seller_1<-readRDS("seller_1.rds")
 amir_deals<-seller_1
 world_happiness_sugar<-readRDS("world_happiness_sugar.rds")
-
+world_happiness<-world_happiness_sugar
 
 # Filter for Belgium
 belgium_consumption <- food_consumption %>%
@@ -190,4 +190,153 @@ mean(deals)
 dbinom(3,3,0.3)
 
 # Probability of closing <= 1 deal out of 3 deals
-pbinom(3,3,0.3)
+pbinom(1,3,0.3)
+
+# Probability of closing > 1 deal out of 3 deals
+pbinom(1,3,0.3, lower.tail=FALSE)
+1-pbinom(1,3,0.3)
+
+# Expected number won with 30% win rate
+won_30pct <- 3*0.3
+won_30pct
+
+# Expected number won with 25% win rate
+won_25pct <- 3*0.25
+won_25pct
+
+# Expected number won with 35% win rate
+won_35pct <- 3*0.35
+won_35pct
+
+# Histogram of amount with 10 bins
+ggplot(amir_deals,aes(amount))+geom_histogram(bins=10)
+
+# Probability of deal < 7500
+pnorm(7500,mean=5000,sd=2000)
+
+# Probability of deal > 1000
+pnorm(1000,mean=5000,sd=2000,lower.tail=FALSE)
+
+# Probability of deal between 3000 and 7000
+pnorm(7000,mean=5000,sd=2000)-pnorm(3000,mean=5000,sd=2000)
+
+# Calculate amount that 75% of deals will be more than
+qnorm(0.75, mean=5000,sd=2000, lower.tail=FALSE)
+
+new_sales<-1:36
+new_sales<-data.frame(new_sales)
+new_sales
+
+# Calculate new average amount
+new_mean <- 5000*1.2
+
+# Calculate new standard deviation
+new_sd <- 2000*1.3
+
+# Simulate 36 sales
+new_sales <- new_sales %>% 
+  mutate(amount = rnorm(36,mean=new_mean,sd=new_sd))
+
+# Create histogram with 10 bins
+ggplot(new_sales,aes(amount))+geom_histogram(bins=10)
+
+# Create a histogram of num_users
+ggplot(amir_deals,aes(num_users))+geom_histogram(bins=10)
+
+# Set seed to 104
+set.seed(104)
+
+# Sample 20 num_users with replacement from amir_deals
+sample(amir_deals$num_users, 20, replace=TRUE) %>%
+  # Take mean
+  mean()
+# Repeat the above 100 times
+sample_means <- replicate(100, sample(amir_deals$num_users, size = 20, replace = TRUE) %>% mean())
+
+# Create data frame for plotting
+samples <- data.frame(mean = sample_means)
+
+# Histogram of sample means
+ggplot(samples,aes(mean)) +
+  geom_histogram(bins=10)
+
+library(data.table)
+
+all_deals <- read.table("all_deals.txt",sep="\t", col.names=c("index","product","num_users") )
+all_deals <- read.csv("all_deals.txt", col.names=c("index","product","num_users") )
+all_deals <- fread("all_deals.txt", col.names=c("index","product","num_users") )
+all_deals<-data.frame(all_deals)
+head(all_deals)
+all_deals<-all_deals%>%select(product,num_users)
+head(all_deals)
+
+
+# Set seed to 321
+set.seed(321)
+
+# Take 30 samples of 20 values of num_users, take mean of each sample
+sample_means <- replicate(30, sample(all_deals$num_users, 20) %>% mean())
+
+# Calculate mean of sample_means
+mean(sample_means)
+
+# Calculate mean of num_users in amir_deals
+mean(amir_deals$num_users)
+
+# Probability of 5 responses
+dpois(5,lambda=4)
+# Probability of 5 responses from coworker
+dpois(5,lambda=5.5)
+# Probability of 2 or fewer responses
+ppois(2,lambda=4)
+# Probability of > 10 responses
+ppois(10,lambda=4,lower.tail=FALSE)
+#What's the probability it takes Amir less than an hour to respond to a lead?
+#To further evaluate Amir's performance, you want to know how much time it takes him to respond to a lead after he opens it. On average, it takes 2.5 hours for him to respond. In this exercise, you'll calculate probabilities of different amounts of time passing between Amir receiving a lead and sending a response.
+#rate=1/lambda 
+#here rate = 1/2.5
+#then Rate=0.4
+# Probability response takes < 1 hour
+pexp(1,rate=0.4)
+
+# Probability response takes > 4 hours
+pexp(4,rate=0.4,lower.tail=FALSE)
+# Probability response takes 3-4 hours
+pexp(4,rate=0.4)-pexp(3,rate=0.4)
+
+# Add a linear trendline to scatterplot
+ggplot(world_happiness, aes(life_exp, happiness_score)) +
+  geom_point() +
+  geom_smooth(method="lm",se=FALSE)
+cor(world_happiness$life_exp,world_happiness$happiness_score)
+
+# Scatterplot of gdp_per_cap and life_exp
+ggplot(world_happiness, aes(gdp_per_cap, life_exp)) +
+  geom_point()
+
+# Correlation between gdp_per_cap and life_exp
+cor(world_happiness$gdp_per_cap,world_happiness$life_exp)
+
+
+# Scatterplot of happiness_score vs. gdp_per_cap
+ggplot(world_happiness,aes(gdp_per_cap,happiness_score))+geom_point()
+
+# Calculate correlation
+cor(world_happiness$gdp_per_cap,world_happiness$happiness_score)
+
+# Create log_gdp_per_cap column
+world_happiness <- world_happiness %>%
+  mutate(log_gdp_per_cap = log(gdp_per_cap))
+
+# Scatterplot of log_gdp_per_cap vs. happiness_score
+ggplot(world_happiness, aes(log_gdp_per_cap,happiness_score)) +
+  geom_point()
+
+# Calculate correlation
+cor(world_happiness$log_gdp_per_cap, world_happiness$happiness_score)
+
+# Scatterplot of grams_sugar_per_day and happiness_score
+ggplot(world_happiness,aes(grams_sugar_per_day,happiness_score))+geom_point()
+
+# Correlation between grams_sugar_per_day and happiness_score
+cor(world_happiness$grams_sugar_per_day,world_happiness$happiness_score)
